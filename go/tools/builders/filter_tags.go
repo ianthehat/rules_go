@@ -26,11 +26,11 @@ import (
 
 func run(args []string) error {
 	// Prepare our flags
-	flags := flag.NewFlagSet("tags", flag.ExitOnError)
+	flags := flag.NewFlagSet("filter_tags", flag.ExitOnError)
 	cgo := flags.Bool("cgo", false, "Sets whether cgo-using files are allowed to pass the filter.")
 	quiet := flags.Bool("quiet", false, "Don't print filenames. Return code will be 0 if any files pass the filter.")
 	tags := flags.String("tags", "", "Only pass through files that match these tags.")
-	matching := flags.String("matching", "", "If set, write the matching files to this file, instead of stdout.")
+	output := flags.String("output", "", "If set, write the matching files to this file, instead of stdout.")
 	// Process the args
 	args, err := expandArgs(args)
 	if err != nil {
@@ -55,16 +55,17 @@ func run(args []string) error {
 		return nil
 	}
 	// print the outputs if we need not
-	output := os.Stdout
-	if *matching != "" {
-		output, err := os.Create(*matching)
+	to := os.Stdout
+	if *output != "" {
+		f, err := os.Create(*output)
 		if err != nil {
 			return err
 		}
-		defer output.Close()
+		defer f.Close()
+		to = f
 	}
 	for _, filename := range filenames {
-		fmt.Fprintln(output, filename)
+		fmt.Fprintln(to, filename)
 	}
 
 	return nil
