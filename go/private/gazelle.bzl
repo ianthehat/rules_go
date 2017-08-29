@@ -14,8 +14,7 @@
 
 _script_content = """
 BASE=$(pwd)
-WORKSPACE=$(dirname $(readlink WORKSPACE))
-cd "$WORKSPACE"
+cd "$BAZEL_PWD"
 $BASE/{gazelle} {args} $@
 """
 
@@ -23,7 +22,6 @@ def _gazelle_script_impl(ctx):
   prefix = ctx.attr.prefix if ctx.attr.prefix else ctx.attr._go_prefix.go_prefix
   args = [ctx.attr.command] + ctx.attr.args
   args += [
-      "-repo_root", "$WORKSPACE",
       "-go_prefix", prefix,
       "-external", ctx.attr.external,
       "-mode", ctx.attr.mode,
@@ -73,6 +71,5 @@ def gazelle(name, **kwargs):
   native.sh_binary(
       name = name,
       srcs = [script_name],
-      data = ["//:WORKSPACE"],
       tags = ["manual"],
   )
