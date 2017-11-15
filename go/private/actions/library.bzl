@@ -25,9 +25,12 @@ load("@io_bazel_rules_go//go/private:providers.bzl",
 load("@io_bazel_rules_go//go/private:actions/archive.bzl",
     "get_archive",
 )
+load("@io_bazel_rules_go//go/private:mode.bzl",
+    "mode_string",
+)
 
 def emit_library(ctx, go_toolchain,
-    mode = None,
+    default_mode = None,
     importpath = "",
     srcs = (),
     deps = (),
@@ -38,7 +41,6 @@ def emit_library(ctx, go_toolchain,
   """See go/toolchains.rst#library for full documentation."""
   dep_runfiles = [d.data_runfiles for d in deps]
   direct = depset()
-  direct_archives = depset()
   gc_goopts = tuple(ctx.attr.gc_goopts)
   cover_vars = ()
   if cgo_info:
@@ -49,7 +51,6 @@ def emit_library(ctx, go_toolchain,
     cgo_info_label = None
   for t in embed:
     goembed = t[GoEmbed]
-    direct_archives += get_archive(t).direct
     srcs = goembed.srcs + srcs
     build_srcs = goembed.build_srcs + build_srcs
     cover_vars += goembed.cover_vars
@@ -76,7 +77,6 @@ def emit_library(ctx, go_toolchain,
 
   for dep in deps:
     direct += [dep[GoLibrary]]
-    direct_archives += [get_archive(dep)]
 
   transitive = depset()
   for golib in direct:
@@ -84,7 +84,7 @@ def emit_library(ctx, go_toolchain,
     transitive += golib.transitive
 
   if want_coverage:
-    go_srcs, cvars = go_toolchain.actions.cover(ctx, go_toolchain, sources=go_srcs, mode=mode)
+    go_srcs, cvars = go_toolchain.actions.cover(ctx, go_toolchain, sources=go_srcs, mode=default_mode)
     cover_vars += cvars
 
   transformed = dict_of(source)
@@ -100,15 +100,6 @@ def emit_library(ctx, go_toolchain,
   for d in dep_runfiles:
     runfiles = runfiles.merge(d)
 
-  golib = GoLibrary(
-      label = ctx.label,
-      importpath = importpath, # The import path for this library
-      direct = direct, # The direct depencancies of the library
-      transitive = transitive, # The transitive set of go libraries depended on
-      srcs = depset(srcs), # The original sources
-      cover_vars = cover_vars, # The cover variables for this library
-      runfiles = runfiles, # The runfiles needed for things including this library
-  )
   goembed = GoEmbed(
       srcs = srcs, # The original sources
       build_srcs = build_srcs, # The transformed sources actually compiled
@@ -117,13 +108,50 @@ def emit_library(ctx, go_toolchain,
       cgo_info = cgo_info, # The cgo information for this library or one of its embeds.
       gc_goopts = gc_goopts, # The options this library was compiled with
   )
-  goarchive = go_toolchain.actions.archive(ctx,
-      go_toolchain = go_toolchain,
-      mode = mode,
-      golib = golib,
-      goembed = goembed,
-      importable = importable,
-      direct = direct_archives,
+  archives = []
+  modes = []
+  for static in [False, True]:
+    for race in [False, True]:
+      for msan in [False, True]:
+        for pure in [False, True]:
+          # Skip all invalid combinations
+          if race and pure: continue
+          if static and not pure: continue
+          # Skip some combinations just to reduce the amount, it's too expensive to do them all
+          if msan: continue
+          if static: continue
+          # Add the resulting mode to the list
+          mode = struct(
+            static = static,
+            race = race,
+            msan = msan,
+            pure = pure,
+            link = default_mode.link,
+            debug = default_mode.debug,
+            strip = default_mode.strip,
+          )
+          direct_archives = []
+          for golib in direct:
+            direct_archives.append(get_archive(golib, mode))
+          print("Archive", ctx.label, mode_string(mode))
+          archives.append(go_toolchain.actions.archive(ctx,
+            go_toolchain = go_toolchain,
+            mode = mode,
+            importpath = importpath,
+            goembed = goembed,
+            importable = importable,
+            direct = direct_archives,
+        ))
+  
+  golib = GoLibrary(
+      label = ctx.label,
+      importpath = importpath, # The import path for this library
+      direct = direct, # The direct depencancies of the library
+      transitive = transitive, # The transitive set of go libraries depended on
+      srcs = depset(srcs), # The original sources
+      cover_vars = cover_vars, # The cover variables for this library
+      runfiles = runfiles, # The runfiles needed for things including this library
+      archives = archives
   )
 
-  return [golib, goembed, goarchive]
+  return [golib, goembed]

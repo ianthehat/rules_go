@@ -87,3 +87,36 @@ def get_mode(ctx, toolchain_flags):
       debug = debug,
       strip = strip,
   )
+
+def _all_modes():
+  modes = []
+  for static in [False, True]:
+    for race in [False, True]:
+      for msan in [False, True]:
+        for pure in [False, True]:
+          for debug in [False, True]:
+            for strip in [True, False]:
+              # Skip all invalid combinations
+              if strip and debug: continue
+              if race and pure: continue
+              if static and not pure: continue
+              # Skip some combinations that don't make much sense
+              if msan and pure: continue
+              if msan and race: continue
+              if msan and not debug: continue
+              # Skip some combinations just to reduce the amount, it's too expensive to do them all
+              if msan: continue
+              if static: continue
+              # Add the resulting mode to the list
+              modes.append(struct(
+                static = static,
+                race = race,
+                msan = msan,
+                pure = pure,
+                link = LINKMODE_NORMAL,
+                debug = debug,
+                strip = strip,
+              ))
+  return modes
+
+ALL_MODES = _all_modes()

@@ -45,7 +45,7 @@ def emit_compile(ctx, go_toolchain,
     args += ["-src", src]
   for archive in archives:
     inputs += [archive.file]
-    args += ["-dep", archive.library.importpath]
+    args += ["-dep", archive.importpath]
     args += ["-I", archive.searchpath]
   args += ["-o", out_lib.path, "-trimpath", ".", "-I", "."]
   args += ["--"]

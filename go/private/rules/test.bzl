@@ -33,9 +33,6 @@ load("@io_bazel_rules_go//go/private:providers.bzl",
 load("@io_bazel_rules_go//go/private:actions/action.bzl",
     "action_with_go_env",
 )
-load("@io_bazel_rules_go//go/private:actions/archive.bzl",
-    "go_archive_aspect",
-)
 
 def _go_test_impl(ctx):
   """go_test_impl implements go testing.
@@ -117,10 +114,10 @@ go_test = rule(
             cfg = "data",
         ),
         "srcs": attr.label_list(allow_files = go_filetype),
-        "deps": attr.label_list(providers = [GoLibrary], aspects = [go_archive_aspect]),
+        "deps": attr.label_list(providers = [GoLibrary]),
         "importpath": attr.string(),
-        "library": attr.label(providers = [GoLibrary], aspects = [go_archive_aspect]),
-        "embed": attr.label_list(providers = [GoEmbed], aspects = [go_archive_aspect]),
+        "library": attr.label(providers = [GoLibrary]),
+        "embed": attr.label_list(providers = [GoEmbed]),
         "pure": attr.string(values=["on", "off", "auto"], default="auto"),
         "static": attr.string(values=["on", "off", "auto"], default="auto"),
         "race": attr.string(values=["on", "off", "auto"], default="auto"),

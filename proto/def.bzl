@@ -11,6 +11,9 @@ load("@io_bazel_rules_go//go/private:rules/prefix.bzl",
 load("@io_bazel_rules_go//go/private:mode.bzl",
     "get_mode",
 )
+load("@io_bazel_rules_go//go/private:actions/archive.bzl",
+    "get_archive",
+)
 
 def _go_proto_library_impl(ctx):
   go_proto_toolchain = ctx.toolchains[ctx.attr._toolchain]
@@ -23,9 +26,9 @@ def _go_proto_library_impl(ctx):
   )
   go_toolchain = ctx.toolchains["@io_bazel_rules_go//go:toolchain"]
   mode = get_mode(ctx, ctx.attr._go_toolchain_flags)
-  golib, goembed, goarchive = go_toolchain.actions.library(ctx,
+  golib, goembed = go_toolchain.actions.library(ctx,
       go_toolchain = go_toolchain,
-      mode = mode,
+      default_mode = mode,
       srcs = go_srcs,
       deps = ctx.attr.deps + go_proto_toolchain.deps,
       embed = ctx.attr.embed,
@@ -33,10 +36,11 @@ def _go_proto_library_impl(ctx):
       importpath = importpath,
       importable = True,
   )
+  goarchive = get_archive(golib, mode)
   return [
-      golib, goembed, goarchive,
+      golib, goembed,
       DefaultInfo(
-          files = depset([]), #TODO:go_archive.lib]),
+          files = depset([goarchive.file]),
           runfiles = golib.runfiles,
       ),
   ]

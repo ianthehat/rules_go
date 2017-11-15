@@ -16,6 +16,9 @@ load("@io_bazel_rules_go//go/private:mode.bzl",
     "mode_string",
     "get_mode",
 )
+load("@io_bazel_rules_go//go/private:actions/archive.bzl",
+    "get_archive",
+)
 
 def emit_binary(ctx, go_toolchain,
     name="",
@@ -33,9 +36,9 @@ def emit_binary(ctx, go_toolchain,
   if name == "": fail("name is a required parameter")
 
   mode = get_mode(ctx, ctx.attr._go_toolchain_flags)
-  golib, goembed, goarchive = go_toolchain.actions.library(ctx,
+  golib, goembed = go_toolchain.actions.library(ctx,
       go_toolchain = go_toolchain,
-      mode = mode,
+      default_mode = mode,
       srcs = srcs,
       deps = deps,
       cgo_info = cgo_info,
@@ -43,7 +46,7 @@ def emit_binary(ctx, go_toolchain,
       importpath = importpath,
       importable = False,
   )
-
+  goarchive = get_archive(golib, mode)
   go_toolchain.actions.link(ctx,
       go_toolchain = go_toolchain,
       archive=goarchive,
