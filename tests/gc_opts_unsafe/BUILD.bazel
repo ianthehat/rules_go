@@ -97,6 +97,7 @@ else
 fi
 if ! grep -q "{0}" bazel-output.txt; then
   echo "error: build failed for incorrect reason, expected {0}" >&2
+  cat bazel-output.txt >&2
   result=1
 fi
 """.format(message),

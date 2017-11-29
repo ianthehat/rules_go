@@ -36,6 +36,7 @@ go_proto_library(
 """
 
 load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_repository")
+load("@io_bazel_rules_go//go/private:rules/prefix.bzl", "go_prefix_default")
 
 _DEFAULT_LIB = "go_default_library"  # matching go_library
 
@@ -107,7 +108,7 @@ def _go_proto_library_gen_impl(ctx):
   """Rule implementation that generates Go using protoc."""
   proto_outs, go_package_name = _check_bazel_style(ctx)
 
-  go_prefix = ctx.attr.go_prefix.go_prefix
+  go_prefix = ctx.attr._go_prefix.go_prefix
   if go_prefix and ctx.label.package and not go_prefix.endswith("/"):
     go_prefix = go_prefix + "/"
   source_go_package = "%s%s%s" % (go_prefix, ctx.label.package, go_package_name)
@@ -184,12 +185,10 @@ _go_proto_library_gen = rule(
             cfg = "host",
         ),
         "_protos": attr.label_list(default = []),
-        "go_prefix": attr.label(
+        "importpath": attr.string(), # TODO: remove when _go_prefix goes away
+        "_go_prefix": attr.label(
             providers = ["go_prefix"],
-            default = Label(
-                "//:go_prefix",
-                relative_to_caller_repository = True,
-            ),
+            default = go_prefix_default,
             allow_files = False,
             cfg = "host",
         ),

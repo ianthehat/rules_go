@@ -41,5 +41,4 @@ def go_prefix(prefix):
 def go_prefix_default(importpath):
   return (None
           if importpath
-          else Label("//:go_prefix", relative_to_caller_repository = True))
-
+          else Label("@{}//:go_prefix".format(native.repository_name())))
