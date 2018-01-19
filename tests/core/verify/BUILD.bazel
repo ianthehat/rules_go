@@ -1,0 +1,56 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test", "go_binary")
+
+test_suite(
+    name = "verify",
+)
+
+go_binary(
+    name = "verify_always",
+    srcs = ["always.go"],
+)
+
+go_binary(
+    name = "verify_never",
+    srcs = ["never.go"],
+)
+
+go_library(
+    name = "lib",
+    srcs = ["lib.go"],
+    importpath = "lib",
+)
+
+go_library(
+    name = "lib_always",
+    srcs = ["lib.go"],
+    importpath = "lib",
+    verify = [":verify_always"],
+)
+
+go_library(
+    name = "lib_never",
+    srcs = ["lib.go"],
+    importpath = "lib",
+    verify = [":verify_never"],
+)
+
+go_test(
+    name = "verify_pass",
+    size = "small",
+    srcs = ["pass_test.go"],
+    deps = [":lib"],
+)
+
+go_test(
+    name = "verify_always_pass",
+    size = "small",
+    srcs = ["pass_test.go"],
+    deps = [":lib_always"],
+)
+
+go_test(
+    name = "verify_always_fail",
+    size = "small",
+    srcs = ["fail_test.go"],
+    deps = [":lib_never"],
+)

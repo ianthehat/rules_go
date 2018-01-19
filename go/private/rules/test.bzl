@@ -196,6 +196,7 @@ go_test = go_rule(
         "gc_linkopts": attr.string_list(),
         "linkstamp": attr.string(),
         "rundir": attr.string(),
+        "verify": attr.label_list(),
         "x_defs": attr.string_dict(),
         "linkmode": attr.string(default=LINKMODE_NORMAL),
     },
