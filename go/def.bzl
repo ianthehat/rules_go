@@ -53,6 +53,7 @@ load(
     _go_binary_macro = "go_binary_macro",
     _go_library_macro = "go_library_macro",
     _go_test_macro = "go_test_macro",
+    _go_plugin_macro = "go_plugin_macro",
 )
 load(
     "@io_bazel_rules_go//go/private:rules/source.bzl",
@@ -103,6 +104,9 @@ go_library = _go_library_macro
 
 go_binary = _go_binary_macro
 """See go/core.rst#go_binary for full documentation."""
+
+go_plugin = _go_plugin_macro
+"""See go/core.rst#go_plugin for full documentation."""
 
 go_test = _go_test_macro
 """See go/core.rst#go_test for full documentation."""

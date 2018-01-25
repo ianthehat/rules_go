@@ -1,0 +1,22 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_plugin", "go_test")
+
+test_suite(
+    name = "go_plugin",
+)
+
+go_plugin(
+    name = "plugin",
+    srcs = ["plugin.go"],
+    tags = ["manual"],
+    pure = "on",
+)
+
+go_test(
+    name = "plugin_test",
+    size = "small",
+    srcs = ["plugin_test.go"],
+    data = [
+        ":plugin",
+    ],
+    tags = ["manual"],
+)

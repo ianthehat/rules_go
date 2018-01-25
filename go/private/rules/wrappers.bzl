@@ -12,10 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@io_bazel_rules_go//go/private:rules/binary.bzl", "go_binary")
-load("@io_bazel_rules_go//go/private:rules/library.bzl", "go_library")
-load("@io_bazel_rules_go//go/private:rules/test.bzl", "go_test")
-load("@io_bazel_rules_go//go/private:rules/cgo.bzl", "setup_cgo_library")
+load(
+    "@io_bazel_rules_go//go/private:rules/binary.bzl",
+    "go_binary",
+)
+load(
+    "@io_bazel_rules_go//go/private:rules/library.bzl",
+    "go_library",
+)
+load(
+    "@io_bazel_rules_go//go/private:rules/test.bzl",
+    "go_test",
+)
+load(
+    "@io_bazel_rules_go//go/private:rules/cgo.bzl",
+    "setup_cgo_library",
+)
+load(
+    "@io_bazel_rules_go//go/private:mode.bzl",
+    "LINKMODE_NORMAL",
+    "LINKMODE_PLUGIN",
+)
 
 _CGO_ATTRS = {
     "srcs": None,
@@ -61,6 +78,11 @@ def go_binary_macro(name, **kwargs):
   _deprecate_importpath(name, "go_binary", kwargs)
   _cgo(name, kwargs)
   go_binary(name = name, **kwargs)
+
+def go_plugin_macro(name, **kwargs):
+  """See go/core.rst#go_binary for full documentation."""
+  _cgo(name, kwargs)
+  go_binary(name = name, linkmode=LINKMODE_PLUGIN, **kwargs)
 
 def go_test_macro(name, **kwargs):
   """See go/core.rst#go_test for full documentation."""
