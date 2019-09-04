@@ -47,6 +47,11 @@ Mailing list: `bazel-go-discuss`_
 Announcements
 -------------
 
+2019-09-04
+  Releases
+  `0.19.4 <https://github.com/bazelbuild/rules_go/releases/tag/0.19.4>`_ and
+  `0.18.10 <https://github.com/bazelbuild/rules_go/releases/tag/0.18.10>`_ are
+  now available with support for Go 1.13.
 2019-08-15
   Releases
   `0.19.3 <https://github.com/bazelbuild/rules_go/releases/tag/0.19.3>`_ and
@@ -57,10 +62,6 @@ Announcements
   `0.19.2 <https://github.com/bazelbuild/rules_go/releases/tag/0.19.2>`_ and
   `0.18.8 <https://github.com/bazelbuild/rules_go/releases/tag/0.18.8>`_ are
   now available with support for Go 1.12.8 and 1.11.13.
-2019-07-19
-  Release
-  `0.19.1 <https://github.com/bazelbuild/rules_go/releases/tag/0.19.1>`_
-  is now available with bug fixes for coverage, debugging, and race mode.
 
 Contents
 --------
@@ -117,7 +118,7 @@ They currently do not support (in order of importance):
 * C/C++ interoperation except cgo (swig etc.)
 * coverage
 
-Note: The latest version of these rules (0.19.3) requires Bazel ≥ 0.23.0 to work.
+Note: The latest version of these rules (0.19.4) requires Bazel ≥ 0.23.0 to work.
 
 The ``master`` branch is only guaranteed to work with the latest version of Bazel.
 
@@ -138,8 +139,8 @@ Setup
     http_archive(
         name = "io_bazel_rules_go",
         urls = [
-            "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/0.19.3/rules_go-0.19.3.tar.gz",
-            "https://github.com/bazelbuild/rules_go/releases/download/0.19.3/rules_go-0.19.3.tar.gz",
+            "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/0.19.4/rules_go-0.19.4.tar.gz",
+            "https://github.com/bazelbuild/rules_go/releases/download/0.19.4/rules_go-0.19.4.tar.gz",
         ],
         sha256 = "313f2c7a23fecc33023563f082f381a32b9b7254f727a7dd2d6380ccc6dfe09b",
     )
@@ -198,8 +199,8 @@ build files automatically using gazelle_.
     http_archive(
         name = "io_bazel_rules_go",
         urls = [
-            "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/0.19.3/rules_go-0.19.3.tar.gz",
-            "https://github.com/bazelbuild/rules_go/releases/download/0.19.3/rules_go-0.19.3.tar.gz",
+            "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/0.19.4/rules_go-0.19.4.tar.gz",
+            "https://github.com/bazelbuild/rules_go/releases/download/0.19.4/rules_go-0.19.4.tar.gz",
         ],
         sha256 = "313f2c7a23fecc33023563f082f381a32b9b7254f727a7dd2d6380ccc6dfe09b",
     )
@@ -315,20 +316,20 @@ Adding external repositories
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 For each Go repository, add a `go_repository`_ rule like the one below.
-This rule comes from the Gazelle repository, so you will need to load it. 
+This rule comes from the Gazelle repository, so you will need to load it.
 `gazelle update-repos`_ can generate or update these rules automatically from
 a go.mod or Gopkg.lock file.
 
 .. code:: bzl
 
     load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-    
+
     # Download the Go rules
     http_archive(
         name = "io_bazel_rules_go",
         urls = [
-            "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/0.19.3/rules_go-0.19.3.tar.gz",
-            "https://github.com/bazelbuild/rules_go/releases/download/0.19.3/rules_go-0.19.3.tar.gz",
+            "https://storage.googleapis.com/bazel-mirror/github.com/bazelbuild/rules_go/releases/download/0.19.4/rules_go-0.19.4.tar.gz",
+            "https://github.com/bazelbuild/rules_go/releases/download/0.19.4/rules_go-0.19.4.tar.gz",
         ],
         sha256 = "313f2c7a23fecc33023563f082f381a32b9b7254f727a7dd2d6380ccc6dfe09b",
     )
